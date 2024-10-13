@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Чат</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h1>Чат</h1>
+    <div id="chat"></div>
+    <input type="text" id="messageInput" placeholder="Введите сообщение">
+    <button id="sendButton">Отправить</button>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        const ws = new WebSocket('ws://localhost:8080');
+
+        ws.onopen = () => {
+            console.log('Соединение открыто');
+        };
+
+        ws.onmessage = (event) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = event.data;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        };
+
+        ws.onclose = () => {
+            console.log('Соединение закрыто');
+        };
+
+        function sendMessage() {
+            if (messageInput.value) {
+                ws.send(messageInput.value);
+                messageInput.value = '';
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>
